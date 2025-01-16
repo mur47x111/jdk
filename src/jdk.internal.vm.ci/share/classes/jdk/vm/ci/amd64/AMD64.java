@@ -29,12 +29,12 @@ import static jdk.vm.ci.code.Register.SPECIAL;
 
 import java.nio.ByteOrder;
 import java.util.EnumSet;
+import java.util.List;
 
 import jdk.vm.ci.code.Architecture;
 import jdk.vm.ci.code.CPUFeatureName;
 import jdk.vm.ci.code.Register;
 import jdk.vm.ci.code.Register.RegisterCategory;
-import jdk.vm.ci.code.RegisterArray;
 import jdk.vm.ci.meta.JavaKind;
 import jdk.vm.ci.meta.PlatformKind;
 
@@ -153,14 +153,14 @@ public class AMD64 extends Architecture {
     public static final Register k6 = new Register(70, 6, "k6", MASK);
     public static final Register k7 = new Register(71, 7, "k7", MASK);
 
-    public static final RegisterArray valueRegistersSSE = new RegisterArray(
+    public static final List<Register> valueRegistersSSE = List.of(
         rax,  rcx,  rdx,   rbx,   rsp,   rbp,   rsi,   rdi,
         r8,   r9,   r10,   r11,   r12,   r13,   r14,   r15,
         xmm0, xmm1, xmm2,  xmm3,  xmm4,  xmm5,  xmm6,  xmm7,
         xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15
     );
 
-    public static final RegisterArray valueRegistersAVX512 = new RegisterArray(
+    public static final List<Register> valueRegistersAVX512 = List.of(
         rax,  rcx,  rdx,   rbx,   rsp,   rbp,   rsi,   rdi,
         r8,   r9,   r10,   r11,   r12,   r13,   r14,   r15,
         xmm0, xmm1, xmm2,  xmm3,  xmm4,  xmm5,  xmm6,  xmm7,
@@ -175,7 +175,7 @@ public class AMD64 extends Architecture {
      */
     public static final Register rip = new Register(72, -1, "rip", SPECIAL);
 
-    public static final RegisterArray allRegisters = new RegisterArray(
+    public static final List<Register> allRegisters = List.of(
         rax,  rcx,  rdx,   rbx,   rsp,   rbp,   rsi,   rdi,
         r8,   r9,   r10,   r11,   r12,   r13,   r14,   r15,
         r16,  r17,  r18,   r19,   r20,   r21,   r22,   r23,
@@ -261,24 +261,13 @@ public class AMD64 extends Architecture {
 
     private final EnumSet<CPUFeature> features;
 
-    /**
-     * Set of flags to control code emission.
-     */
-    public enum Flag {
-        UseCountLeadingZerosInstruction,
-        UseCountTrailingZerosInstruction
-    }
-
-    private final EnumSet<Flag> flags;
-
     private final AMD64Kind largestKind;
 
     private final AMD64Kind largestMaskKind;
 
-    public AMD64(EnumSet<CPUFeature> features, EnumSet<Flag> flags) {
+    public AMD64(EnumSet<CPUFeature> features) {
         super("AMD64", AMD64Kind.QWORD, ByteOrder.LITTLE_ENDIAN, true, allRegisters, LOAD_LOAD | LOAD_STORE | STORE_STORE, 1, 8);
         this.features = features;
-        this.flags = flags;
         assert features.contains(CPUFeature.SSE2) : "minimum config for x64";
 
         if (features.contains(CPUFeature.AVX512F)) {
@@ -302,12 +291,8 @@ public class AMD64 extends Architecture {
         return features;
     }
 
-    public EnumSet<Flag> getFlags() {
-        return flags;
-    }
-
     @Override
-    public RegisterArray getAvailableValueRegisters() {
+    public List<Register> getAvailableValueRegisters() {
         if (features.contains(CPUFeature.AVX512F)) {
             return valueRegistersAVX512;
         } else {
