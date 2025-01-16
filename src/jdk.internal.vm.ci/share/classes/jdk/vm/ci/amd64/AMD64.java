@@ -91,6 +91,13 @@ public class AMD64 extends Architecture {
         r8, r9, r10, r11, r12, r13, r14, r15
     };
 
+    public static final Register[] cpuRegistersAPX = {
+        rax, rcx, rdx, rbx, rsp, rbp, rsi, rdi,
+         r8,  r9, r10, r11, r12, r13, r14, r15,
+        r16, r17, r18, r19, r20, r21, r22, r23,
+        r24, r25, r26, r27, r28, r29, r30, r31
+    };
+
     public static final RegisterCategory XMM = new RegisterCategory("XMM");
 
     // XMM registers
@@ -163,6 +170,27 @@ public class AMD64 extends Architecture {
     public static final List<Register> valueRegistersAVX512 = List.of(
         rax,  rcx,  rdx,   rbx,   rsp,   rbp,   rsi,   rdi,
         r8,   r9,   r10,   r11,   r12,   r13,   r14,   r15,
+        xmm0, xmm1, xmm2,  xmm3,  xmm4,  xmm5,  xmm6,  xmm7,
+        xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15,
+        xmm16, xmm17, xmm18, xmm19, xmm20, xmm21, xmm22, xmm23,
+        xmm24, xmm25, xmm26, xmm27, xmm28, xmm29, xmm30, xmm31,
+        k0, k1, k2, k3, k4, k5, k6, k7
+    );
+
+    public static final List<Register> valueRegistersSSEAndAPX = List.of(
+        rax,  rcx,  rdx,   rbx,   rsp,   rbp,   rsi,   rdi,
+        r8,   r9,   r10,   r11,   r12,   r13,   r14,   r15,
+        r16,  r17,  r18,   r19,   r20,   r21,   r22,   r23,
+        r24,  r25,  r26,   r27,   r28,   r29,   r30,   r31,
+        xmm0, xmm1, xmm2,  xmm3,  xmm4,  xmm5,  xmm6,  xmm7,
+        xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15
+    );
+
+    public static final List<Register> valueRegistersAVX512AndAPX = List.of(
+        rax,  rcx,  rdx,   rbx,   rsp,   rbp,   rsi,   rdi,
+        r8,   r9,   r10,   r11,   r12,   r13,   r14,   r15,
+        r16,  r17,  r18,   r19,   r20,   r21,   r22,   r23,
+        r24,  r25,  r26,   r27,   r28,   r29,   r30,   r31,
         xmm0, xmm1, xmm2,  xmm3,  xmm4,  xmm5,  xmm6,  xmm7,
         xmm8, xmm9, xmm10, xmm11, xmm12, xmm13, xmm14, xmm15,
         xmm16, xmm17, xmm18, xmm19, xmm20, xmm21, xmm22, xmm23,
@@ -293,7 +321,13 @@ public class AMD64 extends Architecture {
 
     @Override
     public List<Register> getAvailableValueRegisters() {
-        if (features.contains(CPUFeature.AVX512F)) {
+        if (features.contains(CPUFeature.APX_F)) {
+            if (features.contains(CPUFeature.AVX512F)) {
+                return valueRegistersAVX512AndAPX;
+            } else {
+                return valueRegistersSSEAndAPX;
+            }
+        } else if (features.contains(CPUFeature.AVX512F)) {
             return valueRegistersAVX512;
         } else {
             return valueRegistersSSE;
