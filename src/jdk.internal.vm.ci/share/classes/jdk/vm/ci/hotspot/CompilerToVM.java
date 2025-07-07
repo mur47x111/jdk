@@ -25,7 +25,9 @@ package jdk.vm.ci.hotspot;
 
 import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
+import java.util.List;
 
+import jdk.internal.access.SharedSecrets;
 import jdk.internal.misc.Unsafe;
 import jdk.vm.ci.code.BytecodeFrame;
 import jdk.vm.ci.code.InstalledCode;
@@ -1063,6 +1065,13 @@ final class CompilerToVM {
      *         {@link Long}
      */
     native Object getFlagValue(String name);
+
+    static <T> List<T> listFromTrustedArray(Object[] array) {
+        if (array == null) {
+            return List.of();
+        }
+        return SharedSecrets.getJavaUtilCollectionAccess().listFromTrustedArray(array);
+    }
 
     /**
      * @see ResolvedJavaType#getInterfaces()

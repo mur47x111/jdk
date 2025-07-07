@@ -174,6 +174,7 @@ module java.base {
         jdk.management,
         jdk.net,
         jdk.sctp,
+        jdk.internal.vm.ci,
         jdk.crypto.cryptoki;
     exports jdk.internal.classfile.components to
         jdk.jfr;
